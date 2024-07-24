@@ -19,9 +19,10 @@ public_users.get("/", function (req, res) {
 public_users.get("/id/:id", function (req, res) {
   //const id = req.params.id;
   const id = parseInt(req.params.id, 10);
+  const book = books.find((book) => book.id === id);
 
-  if (books[id]) {
-    return res.json(books[id]);
+  if (book) {
+    return res.json(book);
   } else {
     return res.status(404).json({ message: "book not found" });
   }
@@ -32,9 +33,9 @@ public_users.get("/author/:author", function (req, res) {
   //const author = req.params.author;
   const author = decodeURIComponent(req.params.author);
 
-  let filtered_books = books.filter((author) => books.author === author);
+  const filtered_books = books.filter((book) => book.author === author);
 
-  if filtered_books.lemgth > 0 {
+  if (filtered_books.length > 0) {
     return res.json(filtered_books);
   } else {
     return res.status(404).json({ message: "book not found" });
@@ -43,14 +44,26 @@ public_users.get("/author/:author", function (req, res) {
 
 // Get all books based on title
 public_users.get("/title/:title", function (req, res) {
-  //Write your code here
-  return res.status(300).json({ message: "Yet to be implemented" });
+  const title = req.params.title;
+  const filtered_books = books.filter((book) => book.title === title);
+
+  if (filtered_books.length > 0) {
+    return res.json(filtered_books);
+  } else {
+    return res.status(404).json({ message: "book not found" });
+  }
 });
 
 //  Get book review
-public_users.get("/review/:isbn", function (req, res) {
-  //Write your code here
-  return res.status(300).json({ message: "Yet to be implemented" });
+public_users.get("/review/:id", function (req, res) {
+  const id = parseInt(req.params.id, 10);
+  const book = books.find((book) => book.id === id);
+
+  if (book) {
+    return res.json(book.reviews);
+  } else {
+    return res.status(404).json({ message: "Review not found" });
+  }
 });
 
 module.exports.general = public_users;
