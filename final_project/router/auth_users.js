@@ -64,6 +64,11 @@ regd_users.put("/auth/review/:id", (req, res) => {
   }
 });
 
+//delete a book review
+regd_users.delete("/auth/review/:isbn", (req, res) => {
+
+}
+
 module.exports.authenticated = regd_users;
 module.exports.isValid = isValid;
 module.exports.users = users;
