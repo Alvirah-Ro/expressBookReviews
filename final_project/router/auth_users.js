@@ -51,13 +51,20 @@ regd_users.put("/auth/review/:id", (req, res) => {
   const book = books.find((book) => book.id === id);
 
   if (book) {
-    let review = req.query.review;
+    const { review } = req.body;
+
     if (!review) {
       return res.status(400).json({ message: "Review content is required" });
     }
+
+    if (!book.reviews) {
+      book.reviews = [];
+    }
+
     book.reviews.push(review);
+
     return res.json({
-      message: `Your review for book {id=${id}} has been added or updated`,
+      message: `Your review for book with ID ${id} has been added or updated`,
     });
   } else {
     return res.status(404).json({ message: "Book not found" });
