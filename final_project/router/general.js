@@ -34,6 +34,21 @@ const fetchBookById = (id) => {
 
 module.exports = fetchBookById;
 
+//get books by author using a Promise
+const fetchBooksByAuthor = (author) => {
+  return new Promise((resolve, reject) => {
+    const booksByAuthor = books.filter((book) => book.author === author);
+    if (booksByAuthor.length > 0) {
+      resolve(booksByAuthor);
+    } else {
+      reject("book not found");
+    }
+  });
+};
+
+module.exports = fetchBooksByAuthor;
+
+
 public_users.post("/register", (req, res) => {
   const { username, password } = req.body;
 
