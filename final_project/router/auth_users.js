@@ -51,7 +51,7 @@ regd_users.put("/auth/review/:id", (req, res) => {
   const book = books.find((book) => book.id === id);
 
   if (book) {
-    let review = req.query.review;
+    let review = req.body.review;
     if (!review) {
       return res.status(400).json({ message: "Review content is required" });
     }

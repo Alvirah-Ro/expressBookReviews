@@ -3,6 +3,36 @@ let books = require("./booksdb.js");
 let isValid = require("./auth_users.js").isValid;
 let users = require("./auth_users.js").users;
 const public_users = express.Router();
+const axios = require('axios');
+
+//get list of books using Axios
+const fetchBooks = async () => {
+  try {
+    const response = await axios.get('https://75mwql-5000.csb.app');
+    const listOfEntries = response.data.entries;
+    listOfEntries.forEach((entry) => {
+      console.log(entry.Category);
+    });
+  } catch (error) {
+    console.error('Error fetching books', error);
+  }
+}
+
+module.exports = fetchBooks;
+
+//get book by id using a promise
+const fetchBookById = (id) => {
+  return new Promise((resolve, reject) => {
+    const book = books.find((book) => book.id === id);
+    if (book) {
+      resolve(book);
+    } else {
+      reject("book not found");
+    }
+  });
+};
+
+module.exports = fetchBookById;
 
 public_users.post("/register", (req, res) => {
   const { username, password } = req.body;
