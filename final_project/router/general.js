@@ -48,6 +48,21 @@ const fetchBooksByAuthor = (author) => {
 
 module.exports = fetchBooksByAuthor;
 
+//get books by title using a promise
+const fetchBooksByTitle = (title) => {
+  return new Promise((resolve, reject) => {
+    const booksByTitle = books.filter((book) => book.title === title);
+    if (booksByTitle.length > 0) {
+      resolve(booksByTitle);
+    } else {
+      reject("book not found");
+    }
+  });
+};
+
+module.exports = fetchBooksByTitle;
+
+
 
 public_users.post("/register", (req, res) => {
   const { username, password } = req.body;
