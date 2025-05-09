@@ -28,7 +28,10 @@ if (req.session.authorization) {
     }
 });
 
-const PORT =5000;
+const connectDB = require('./db');
+connectDB();
+
+const PORT = 5000;
 
 app.use("/customer", customer_routes);
 app.use("/", genl_routes);
