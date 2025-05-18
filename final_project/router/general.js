@@ -1,24 +1,28 @@
 const express = require("express");
-let books = require("./booksdb.js");
+const mongoose = require('mongoose');
+const Book = require('./models/book'); // adjust path if needed
 let isValid = require("./auth_users.js").isValid;
 let users = require("./auth_users.js").users;
 const public_users = express.Router();
 const axios = require('axios');
 
-//get list of books using Axios
-const fetchBooks = async () => {
-  try {
-    const response = await axios.get('https://75mwql-5000.csb.app');
-    const listOfEntries = response.data.entries;
-    listOfEntries.forEach((entry) => {
-      console.log(entry.Category);
-    });
-  } catch (error) {
-    console.error('Error fetching books', error);
-  }
-}
 
-module.exports = fetchBooks;
+
+// This code was from the original assignment that used an external API
+//get list of books using Axios 
+// const fetchBooks = async () => {
+//   try {
+//     const response = await axios.get('https://75mwql-5000.csb.app');
+//     const listOfEntries = response.data.entries;
+//     listOfEntries.forEach((entry) => {
+//       console.log(entry.Category);
+//     });
+//   } catch (error) {
+//     console.error('Error fetching books', error);
+//   }
+// }
+
+// module.exports = fetchBooks;
 
 //get book by id using a promise
 const fetchBookById = (id) => {
@@ -32,8 +36,6 @@ const fetchBookById = (id) => {
   });
 };
 
-module.exports = fetchBookById;
-
 //get books by author using a Promise
 const fetchBooksByAuthor = (author) => {
   return new Promise((resolve, reject) => {
@@ -46,7 +48,6 @@ const fetchBooksByAuthor = (author) => {
   });
 };
 
-module.exports = fetchBooksByAuthor;
 
 //get books by title using a promise
 const fetchBooksByTitle = (title) => {
@@ -59,10 +60,6 @@ const fetchBooksByTitle = (title) => {
     }
   });
 };
-
-module.exports = fetchBooksByTitle;
-
-
 
 public_users.post("/register", (req, res) => {
   const { username, password } = req.body;
@@ -82,9 +79,13 @@ public_users.post("/register", (req, res) => {
 });
 
 /// Get the book list available in the shop
-public_users.get("/", function (req, res) {
-  //Write your code here
-  res.status(200).json(books);
+public_users.get("/", async (req, res) => {
+  try {
+    const books = await  Book.find();
+    res.status(200).json(books);
+  } catch (err) {
+    res.status(500).json({ message: "Database error" });
+  }
 });
 
 // Get book details based on ISBN
@@ -138,4 +139,10 @@ public_users.get("/review/:id", function (req, res) {
   }
 });
 
-module.exports.general = public_users;
+module.exports = {
+  fetchBooks,
+  fetchBookById,
+  fetchBooksByAuthor,
+  fetchBooksByTitle,
+  general: public_users
+};
