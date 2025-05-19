@@ -1,65 +1,89 @@
 const express = require("express");
 const mongoose = require('mongoose');
-const Book = require('./models/book'); // adjust path if needed
+const Book = require('./models/book.js');
 let isValid = require("./auth_users.js").isValid;
 let users = require("./auth_users.js").users;
 const public_users = express.Router();
-const axios = require('axios');
 
 
+/// Get the book list available in the shop
+public_users.get("/", async (req, res) => {
+  try {
+    const books = await Book.find();
+    res.status(200).json(books);
+  } catch (err) {
+    res.status(500).json({ message: "Database error when fetching list of all books" });
+  }
+});
 
-// This code was from the original assignment that used an external API
-//get list of books using Axios 
-// const fetchBooks = async () => {
-//   try {
-//     const response = await axios.get('https://75mwql-5000.csb.app');
-//     const listOfEntries = response.data.entries;
-//     listOfEntries.forEach((entry) => {
-//       console.log(entry.Category);
-//     });
-//   } catch (error) {
-//     console.error('Error fetching books', error);
-//   }
-// }
 
-// module.exports = fetchBooks;
+// Get book details based on id
+public_users.get("/id/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    const book = await Book.findOne({ id: id.toString() });
 
-//get book by id using a promise
-const fetchBookById = (id) => {
-  return new Promise((resolve, reject) => {
-    const book = books.find((book) => book.id === id);
     if (book) {
-      resolve(book);
+      return res.json(book);
     } else {
-      reject("book not found");
+      return res.status(404).json({ message: "book not found" });
     }
-  });
-};
-
-//get books by author using a Promise
-const fetchBooksByAuthor = (author) => {
-  return new Promise((resolve, reject) => {
-    const booksByAuthor = books.filter((book) => book.author === author);
-    if (booksByAuthor.length > 0) {
-      resolve(booksByAuthor);
-    } else {
-      reject("book not found");
-    }
-  });
-};
+  } catch (err) {
+    return res.status(500).json({ message: "Database error when fetching books by id" });
+  }
+});
 
 
-//get books by title using a promise
-const fetchBooksByTitle = (title) => {
-  return new Promise((resolve, reject) => {
-    const booksByTitle = books.filter((book) => book.title === title);
-    if (booksByTitle.length > 0) {
-      resolve(booksByTitle);
+// Get all books based on title
+public_users.get("/title/:title", async (req, res) => {
+  try {
+    const title = req.params.title;
+    const books = await Book.find({ title });
+
+    if (books.length > 0) {
+      return res.json(books);
     } else {
-      reject("book not found");
+      return res.status(404).json({ message: "book title not found" });
     }
-  });
-};
+  } catch (err) {
+    return res.status(500).json({ message: "Database error when fetching books by title" });
+  }
+});
+
+
+// Get book details based on author
+public_users.get("/author/:author", async (req, res) => {
+  try {
+    const author = (req.params.author);
+    const books = await Book.find({ author });
+
+    if (books.length > 0) {
+      return res.json(books);
+    } else {
+      return res.status(404).json({ message: "author not found" });
+    }
+  } catch (err) {
+    return res.status(500).json({ message: "Database error when fetching books by author" })
+  }
+});
+
+
+//  Get book review
+public_users.get("/review/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    const book = await Book.findOne({ id: id.toString() });
+
+    if (book) {
+      return res.json(book.reviews);
+    } else {
+      return res.status(404).json({ message: "Reviews not found" });
+    }
+  } catch (err) {
+    return res.status(500).json({ message: "Database error when fetching reviews by book id" });
+  }
+});
+
 
 public_users.post("/register", (req, res) => {
   const { username, password } = req.body;
@@ -78,71 +102,4 @@ public_users.post("/register", (req, res) => {
   return res.status(201).json({ message: "User registered successfully" });
 });
 
-/// Get the book list available in the shop
-public_users.get("/", async (req, res) => {
-  try {
-    const books = await  Book.find();
-    res.status(200).json(books);
-  } catch (err) {
-    res.status(500).json({ message: "Database error" });
-  }
-});
-
-// Get book details based on ISBN
-public_users.get("/id/:id", function (req, res) {
-  //const id = req.params.id;
-  const id = parseInt(req.params.id, 10);
-  const book = books.find((book) => book.id === id);
-
-  if (book) {
-    return res.json(book);
-  } else {
-    return res.status(404).json({ message: "book not found" });
-  }
-});
-
-// Get book details based on author
-public_users.get("/author/:author", function (req, res) {
-  //const author = req.params.author;
-  const author = decodeURIComponent(req.params.author);
-
-  const filtered_books = books.filter((book) => book.author === author);
-
-  if (filtered_books.length > 0) {
-    return res.json(filtered_books);
-  } else {
-    return res.status(404).json({ message: "book not found" });
-  }
-});
-
-// Get all books based on title
-public_users.get("/title/:title", function (req, res) {
-  const title = req.params.title;
-  const filtered_books = books.filter((book) => book.title === title);
-
-  if (filtered_books.length > 0) {
-    return res.json(filtered_books);
-  } else {
-    return res.status(404).json({ message: "book not found" });
-  }
-});
-
-//  Get book review
-public_users.get("/review/:id", function (req, res) {
-  const id = parseInt(req.params.id, 10);
-  const book = books.find((book) => book.id === id);
-
-  if (book) {
-    return res.json(book.reviews);
-  } else {
-    return res.status(404).json({ message: "Review not found" });
-  }
-});
-
-module.exports = {
-  fetchBooks,
-  fetchBookById,
-  fetchBooksByAuthor,
-  fetchBooksByTitle,
-  general: public_users
-};
+module.exports = { general: public_users };
