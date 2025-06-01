@@ -1,6 +1,6 @@
 const express = require("express");
 const mongoose = require('mongoose');
-const Book = require('./models/book.js');
+const Book = require('../models/book.js');
 let isValid = require("./auth_users.js").isValid;
 let users = require("./auth_users.js").users;
 const public_users = express.Router();
@@ -103,24 +103,6 @@ public_users.get("/review/:id", async (req, res) => {
   } catch (err) {
     return res.status(500).json({ message: "Database error when fetching reviews by book id" });
   }
-});
-
-
-public_users.post("/register", (req, res) => {
-  const { username, password } = req.body;
-
-  if (!username || !password) {
-    return res
-      .status(400)
-      .json({ message: "Username and password are required" });
-  }
-
-  if (!isValid(username)) {
-    return res.status(409).json({ message: "Username already exists" });
-  }
-
-  users.push({ username, password });
-  return res.status(201).json({ message: "User registered successfully" });
 });
 
 module.exports = { general: public_users };

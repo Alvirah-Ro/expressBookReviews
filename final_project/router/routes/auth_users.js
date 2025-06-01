@@ -1,7 +1,7 @@
 const express = require("express");
 const jwt = require("jsonwebtoken");
 const mongoose = require('mongoose');
-const Book = require('./models/book'); // adjust path if needed
+const Book = require('../models/book'); // adjust path if needed
 const regd_users = express.Router();
 
 let users = [];

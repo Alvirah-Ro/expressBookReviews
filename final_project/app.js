@@ -1,14 +1,11 @@
 const express = require('express');
-const jwt = require('jsonwebtoken');
-const session = require('express-session')
-const customer_routes = require('./router/auth_users.js').authenticated;
-const genl_routes = require('./router/general.js').general;
-
 const app = express();
+const jwt = require('jsonwebtoken');
+const customer_routes = require('./router/routes/auth_users.js').authenticated;
+const genl_routes = require('./router/routes/book_routes.js').general;
+const public_users = require("./auth_users.js")
 
 app.use(express.json());
-
-app.use("/customer",session({secret:"fingerprint_customer",resave: true, saveUninitialized: true}))
 
 app.use("/customer/auth/*", function auth(req,res,next){
 // Write the authenication mechanism here
@@ -33,8 +30,8 @@ connectDB();
 
 const PORT = 5001;
 
-app.use("/customer", customer_routes);
 app.use("/", genl_routes);
+app.use("/users", customer_routes);
 
 
 app.listen(PORT,()=>console.log("Server is running"));
