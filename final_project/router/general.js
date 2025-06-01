@@ -16,6 +16,27 @@ public_users.get("/", async (req, res) => {
   }
 });
 
+// Search endpoint using query parameters - this replaces the following get requests
+public_users.get("/search", async (req, res) => {
+  try {
+    const { title, author, id } = req.query;
+    
+    const query = {};
+    if (title) query.title = { $regex: title, $options: "i" };
+    if (author) query.author = { $regex: author, $options: "i" };
+    if (id) query.id = id;
+
+    const books = await Book.find(query);
+
+    if (books.length > 0) {
+      return res.json(books);
+    } else {
+      return res.status(404).json({ message: "No matching books found" });
+    }
+  } catch (err) {
+    return res.status(500).json({ message: "Database error when searching for books" });
+  }
+});
 
 // Get book details based on id
 public_users.get("/id/:id", async (req, res) => {
