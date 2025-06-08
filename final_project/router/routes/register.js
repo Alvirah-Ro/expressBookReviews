@@ -4,6 +4,8 @@ const User = require("../models/user.js");
 const bcrypt = require("bcryptjs"); // To securely store passwords
 const jwt = require("jsonwebtoken");
 
+
+
 public_users.post("/register", async (req, res) => {
   const { username, password } = req.body;
 

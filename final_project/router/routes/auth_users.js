@@ -3,6 +3,7 @@ const jwt = require("jsonwebtoken");
 const mongoose = require('mongoose');
 const Book = require('../models/book'); // adjust path if needed
 const regd_users = express.Router();
+const authMiddleware = require("../middleware/auth.js")
 
 let users = [];
 
