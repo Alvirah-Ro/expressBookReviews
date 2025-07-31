@@ -14,6 +14,10 @@ public_users.post("/register", async (req, res) => {
     return res.status(400).json({ message: "Username and password are required" });
   }
 
+  if (username.length < 3 || password.length < 6) {
+    return res.status(400).json({ message: "Username must be at least 3 characters; password at least 6 characters" });
+  }
+
   try {
     // Check if user already exists
     const existingUser = await User.findOne({ username });
@@ -28,6 +32,7 @@ public_users.post("/register", async (req, res) => {
     
     res.status(201).json({ message: "User registered successfully" });
   } catch (err) {
+    console.error("Registration error:", err);
     res.status(500).json({ message: "Registration failed" });
   }
 });

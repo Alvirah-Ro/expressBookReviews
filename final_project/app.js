@@ -5,6 +5,8 @@ const customer_routes = require('./router/routes/auth_users.js').authenticated;
 const genl_routes = require('./router/routes/book_routes.js').general;
 const public_users = require("./auth_users.js")
 
+require("dotenv").config();
+
 app.use(express.json());
 
 app.use("/customer/auth/*", function auth(req,res,next){

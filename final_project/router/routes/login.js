@@ -27,9 +27,11 @@ regd_users.post("/login", async (req, res) => {
         }
 
         // Create JWT
-        const token = jwt.sign({ username: user.username, id: user._id}, "access", {
-            expiresIn: "1hr",
-        });
+        const token = jwt.sign(
+            { username: user.username, id: user._id},
+            process.env.JWT_SECRET || "default_secret",
+            { expiresIn: "1h" }
+        );
 
         return res.json({ message: "Login successful", token });
     } catch (err) {
