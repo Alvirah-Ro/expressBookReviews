@@ -7,23 +7,66 @@ const authMiddleware = require("../middleware/auth.js")
 
 
 // Add a book review
-regd_users.put("/auth/review/:id", (req, res) => {
-  const id = parseInt(req.params.id, 10);
-  const book = books.find((book) => book.id === id);
+regd_users.post("/auth/review/:id", authMiddleware, async (req, res) => {
+  const { username, text, rating } = req.body;
+  const id = req.params.id;
+  const reviewDate = req.body.date || Date.now();
 
-  if (book) {
-    let review = req.body.review;
-    if (!review) {
-      return res.status(400).json({ message: "Review content is required" });
+  // Input validation
+  if (!username) {
+    return res.status(400).json({message: "Username not found.  Only registered users may post a review"});
+  }
+
+  if (!text) {
+    return res.status(400).json({message: "Review content is empty.  Please enter book review text"});
+  }
+
+  try {
+    const book = await Book.findOne({ id: id.toString() });
+
+    if (!book) {
+      return res.status(404).json({message: "Book not found" });
     }
-    book.reviews.push(review);
-    return res.json({
-      message: `Your review for book {id=${id}} has been added or updated`,
-    });
-  } else {
-    return res.status(404).json({ message: "Book not found" });
+
+    const newReview = {
+      username,
+      text,
+      rating,
+      date: reviewDate
+    };
+
+    if (!book.reviews) {
+      book.reviews = [];
+    }
+
+    book.reviews.push(newReview);
+    await book.save();
+
+    return res.status(201).json({ message: `Your review for book ${book.title} has been added.`})
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Database error when adding review" });
   }
 });
+  
+
+// old code from before MongoDB was added
+//   const id = parseInt(req.params.id, 10);
+//   const book = books.find((book) => book.id === id);
+
+//   if (book) {
+//     let review = req.body.review;
+//     if (!review) {
+//       return res.status(400).json({ message: "Review content is required" });
+//     }
+//     book.reviews.push(review);
+//     return res.json({
+//       message: `Your review for book {id=${id}} has been added or updated`,
+//     });
+//   } else {
+//     return res.status(404).json({ message: "Book not found" });
+//   }
+// });
 
 
 //delete a book review
